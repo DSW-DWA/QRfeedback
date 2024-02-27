@@ -4,6 +4,7 @@ import os
 import sys
 
 
+# python QRfeedBack/manage.py runserver
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'QRfeedBack.settings')
