@@ -5,4 +5,4 @@
 ```
 py -m venv venv
 venv\Script\activate.bat
-pip instal requirements.txt
+pip install -r requirements.txt
