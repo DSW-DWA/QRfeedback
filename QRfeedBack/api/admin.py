@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from .models import Review, Image
+from .models import Review
 
-admin.site.register(Review)
-admin.site.register(Image)
+
+@admin.register(Review)
+class AuthorAdmin(admin.ModelAdmin):
+    readonly_fields = ['pub_date']
