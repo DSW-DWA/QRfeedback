@@ -5,7 +5,7 @@ from .models import Review, Image
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ['image_url']
+        fields = ['image']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -14,12 +14,32 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ['review_text', 'pub_date', 'images']
+        fields = ['id', 'review_text', 'pub_date', 'images']
+
+    def to_representation(self, instance):
+        repr_data = {
+            'id': instance.id,
+            'review_text': instance.review_text,
+            'pub_date': instance.pub_date,
+        }
+        images = instance.images.values_list('image')
+        repr_data['images'] = [i[0] for i in images]
+        return repr_data
+
+    def to_internal_value(self, data):
+        imagesData = []
+        if 'images' in data:
+            images = data.pop('images')
+            for imgData in images:
+                imagesData.append({'image': imgData})
+        if 'review_text' in data:
+            review_text = data['review_text']
+        processed_data = {'review_text': review_text, 'images': imagesData}
+        return super().to_internal_value(processed_data)
 
     def create(self, validated_data):
-        images = validated_data.pop('images')
         review = Review.objects.create(
             review_text=validated_data['review_text'])
-        for img in images:
-            Image.objects.create(review=review, **img)
+        for img in validated_data['images']:
+            Image.objects.create(review=review, image=img['image'])
         return review

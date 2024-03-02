@@ -1,9 +1,10 @@
-from .models import Review
-from .serializers import ReviewSerializer, ImageSerializer
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import Review
+from .serializers import ReviewSerializer
 
 
 class ReviewList(APIView):
@@ -15,20 +16,17 @@ class ReviewList(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        print(request.data)
-        if 'images' in request.data:
-            for img in request.data['images']:
-                print(img)
         serializer = ReviewSerializer(data=request.data)
-        if serializer.is_valid():
-            print(serializer.validated_data)
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class ReviewDetail(APIView):
     def get(self, request, pk):
-        review = Review.objects.get(pk=pk)
+        try:
+            review = Review.objects.get(pk=pk)
+        except Review.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = ReviewSerializer(review)
         return Response(serializer.data)
