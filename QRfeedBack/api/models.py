@@ -3,7 +3,7 @@ import os
 
 
 def get_upload_path(instance, filename):
-    return os.path.join('images', f'review_{instance.pk}', filename)
+    return os.path.join('images', f'review_{instance.review.pk}', filename)
 
 
 class Review(models.Model):
@@ -16,3 +16,13 @@ class Review(models.Model):
         if len(self.review_text) > len(str_repr):
             return str_repr + '...'
         return str_repr
+
+
+class Image(models.Model):
+    review = models.ForeignKey(
+        Review, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(
+        upload_to=get_upload_path, blank=False, null=False)
+
+    def __str__(self):
+        return self.image.url

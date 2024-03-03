@@ -1,9 +1,10 @@
+from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .models import Review
 from .serializers import ReviewSerializer
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework import status
 
 
 class ReviewList(APIView):
@@ -16,10 +17,9 @@ class ReviewList(APIView):
 
     def post(self, request):
         serializer = ReviewSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class ReviewDetail(APIView):
