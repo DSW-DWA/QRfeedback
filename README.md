@@ -8,7 +8,7 @@ venv\Script\activate.bat
 pip install -r requirements.txt
 ```
 
-### Развертывание проекта:
+## Развертывание проекта
 1. Создать пользователя и базу данных в PostgreSQL (если не создано заранее):
 ```
 createuser qrfeedbackuser -P
@@ -35,3 +35,7 @@ python manage.py createsuperuser
 ```
 python manage.py runserver
 ```
+
+## Документация
+- [Спецификация API](https://valley-barge-996.notion.site/QRfeedback-API-58136eee7c084d1784763863757e88b5)
+- [Схема базы данных](https://dbdiagram.io/d/QRFeedback-65e3c4f0cd45b569fb5fbb88)
