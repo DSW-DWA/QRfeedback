@@ -1,8 +1,37 @@
 # QRfeedback
 Сервис позволяющий по собирать обратную  связь с помощью QR-кода
 
-Устновка окружения на Windows
+Установка окружения на Windows
 ```
 py -m venv venv
 venv\Script\activate.bat
 pip install -r requirements.txt
+```
+
+### Развертывание проекта:
+1. Создать пользователя и базу данных в PostgreSQL (если не создано заранее):
+```
+createuser qrfeedbackuser -P
+createdb -O qrfeedbackuser qrfeedackdb
+```
+2. Создать .env файл в корне джанго проекта (в папке с manage.py). Пример файла с необходимыми полями:
+```
+DB_NAME=qrfeedbackdb
+DB_USER=qrfeedbackuser
+DB_PASSWORD=qrfeedbackpassword
+DB_HOST=localhost
+DB_PORT=5432
+```
+3. Провести и применить миграции:
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+4. Создать суперюзера для упрощенного управления моделями через панель админа (опционально):
+```
+python manage.py createsuperuser
+```
+5. Запустить сервер:
+```
+python manage.py runserver
+```
