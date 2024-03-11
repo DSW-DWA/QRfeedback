@@ -6,7 +6,9 @@ djangorestframework==3.14.0
 pillow==10.2.0
 psycopg==3.1.18
 psycopg-binary==3.1.18
+pypng==0.20220715.0
 pytz==2024.1
+segno==1.6.1
 sqlparse==0.4.4
 typing_extensions==4.10.0
 tzdata==2024.1

@@ -43,3 +43,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         for img in validated_data['images']:
             Image.objects.create(review=review, image=img['image'])
         return review
+
+class QRSerializer(serializers.Serializer):
+    url = serializers.URLField(required=True)
+    scale = serializers.IntegerField(required=False, default=10)
+    border = serializers.IntegerField(required=False, default=5)

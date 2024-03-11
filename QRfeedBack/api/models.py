@@ -2,14 +2,18 @@ from django.db import models
 import os
 
 
-def get_upload_path(instance, filename):
+def get_upload_image_path(instance, filename):
     return os.path.join('images', f'review_{instance.review.pk}', filename)
+
+
+def get_upload_qr_path(instance, filename):
+    return os.path.join('qrcodes', filename)
 
 
 class Review(models.Model):
     review_text = models.TextField(blank=False, null=False)
     pub_date = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(upload_to=get_upload_path, blank=True, null=True)
+    image = models.ImageField(upload_to=get_upload_image_path, blank=True, null=True)
 
     def __str__(self):
         str_repr = ' '.join(self.review_text.split()[:5])
@@ -22,7 +26,7 @@ class Image(models.Model):
     review = models.ForeignKey(
         Review, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(
-        upload_to=get_upload_path, blank=False, null=False)
+        upload_to=get_upload_image_path, blank=False, null=False)
 
     def __str__(self):
         return self.image.url
