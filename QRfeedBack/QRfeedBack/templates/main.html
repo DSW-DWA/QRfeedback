@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обращение</title>
+    <style>
+        body {
+    font-family: 'Daxline', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    text-align: center;
+    padding: 15px;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.container {
+    width: 90%; /* Ширина контейнера */
+    max-width: 500px; /* Максимальная ширина контейнера */
+    margin: 0 auto; /* Автоматическое выравнивание по центру */
+    padding: 15px; /* Внутренние отступы */
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    margin-bottom: 15px;
+}
+
+form {
+    width: 100%;
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 15px;
+}
+
+textarea,
+input[type="file"] {
+    width: calc(100% - 22px);
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-family: 'Daxline', Arial, sans-serif;
+    font-size: 14px;
+    background-color: #fff;
+}
+
+button {
+    position: relative;
+    width: 100%;
+    padding: 15px;
+    background-color: #683A7C;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+button::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transition: transform 0.5s ease;
+    pointer-events: none;
+    z-index: -1; /* Устанавливаем z-index, чтобы блик находился за кнопкой */
+}
+
+button:hover::before {
+    transform: translate(25%, 25%);
+}
+
+
+
+textarea {
+    height: 80px;
+    transition: height 0.3s ease-in-out;
+}
+
+.file-input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.file-input-container label {
+    cursor: pointer;
+    padding: 8px 12px;
+    background-color: transparent;
+    color: #2B2A29;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    transition: opacity 0.3s ease;
+}
+
+.file-input-container label:hover {
+    opacity: 0.8;
+}
+
+.file-input-container input[type="file"] {
+    display: none;
+}
+
+.file-preview {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.file-item {
+    position: relative;
+}
+
+.file-item img {
+    max-width: 80px;
+    max-height: 80px;
+    border-radius: 8px;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.file-item img:hover {
+    opacity: 1;
+}
+
+.file-item .delete-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #333;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+/* Медиа-запросы для адаптивного дизайна */
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    textarea, input[type="file"], button {
+        margin-bottom: 10px;
+        padding: 8px;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ждем ваше обращение!</h1>
+    </header>
+
+    <div class="container">
+        <!-- Форма для ввода данных и загрузки изображения -->
+        <form id="upload-form" method="post" action="#" enctype="multipart/form-data">
+            {% csrf_token %}  <!-- CSRF-токен для безопасной отправки формы -->
+
+            <!-- Поле для ввода текста -->
+            <textarea id="user_input" name="user_input" placeholder="Напишите ваше обращение здесь..." rows="1"></textarea>
+
+            <!-- Контейнер для загрузки изображений -->
+            <div class="file-input-container">
+                <label for="image-upload">Добавить файл</label>
+                <input id="image-upload" type="file" name="image" accept="image/*" multiple>
+            </div>
+
+            <!-- Предпросмотр загруженных изображений -->
+            <div id="image-preview" class="file-preview"></div>
+
+            <!-- Кнопка отправки формы -->
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Все права защищены</p>
+    </footer>
+
+    <script>
+        // Обработчик события input для input[type="file"]
+        document.getElementById('image-upload').addEventListener('change', function(event) {
+            var previewContainer = document.getElementById('image-preview');
+
+            // Перебираем выбранные файлы
+            for (var i = 0; i < event.target.files.length; i++) {
+                var file = event.target.files[i];
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    // Создаем элемент img для предпросмотра изображения
+                    var img = document.createElement('img');
+                    img.src = e.target.result;
+
+                    // Создаем контейнер для элемента img и кнопки удаления
+                    var itemContainer = document.createElement('div');
+                    itemContainer.classList.add('file-item');
+
+                    // Создаем кнопку удаления
+                    var deleteButton = document.createElement('button');
+                    deleteButton.classList.add('delete-button');
+                    deleteButton.innerHTML = '&times;';
+
+                    // Обработчик события клика для кнопки удаления
+                    deleteButton.addEventListener('click', function() {
+                        previewContainer.removeChild(itemContainer);
+                    });
+
+                    // Добавляем элементы в контейнер и контейнер в предпросмотр
+                    itemContainer.appendChild(img);
+                    itemContainer.appendChild(deleteButton);
+                    previewContainer.appendChild(itemContainer);
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
