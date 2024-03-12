@@ -8,7 +8,7 @@ venv\Script\activate.bat
 pip install -r requirements.txt
 ```
 
-## Развертывание проекта
+## Локальный запуск проекта
 1. Создать пользователя и базу данных в PostgreSQL (если не создано заранее):
 ```
 createuser qrfeedbackuser -P
