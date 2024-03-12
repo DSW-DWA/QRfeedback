@@ -12,6 +12,7 @@ from .serializers import ReviewSerializer, QRSerializer
 
 logger = logging.getLogger(__name__)
 
+
 class ReviewList(APIView):
     parser_classes = [FormParser, MultiPartParser]
 
@@ -61,24 +62,25 @@ class ReviewDetail(APIView):
             logger.error(ex)
 
             return Response(status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 class QRGenerator(APIView):
     renderer_classes = [PNGRenderer]
 
     def post(self, request):
-        try :
+        try:
             serializer = QRSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            
+
             buffer = io.BytesIO()
             url, scale, border = serializer.data['url'], serializer.data['scale'], serializer.data['border']
-            segno.make_qr(url).save(buffer, kind='png', scale=scale, border=border)
+            segno.make_qr(url).save(buffer, kind='png',
+                                    scale=scale, border=border)
             img = buffer.getvalue()
 
             logger.info('QR generated')
-            return Response(img, status= status.HTTP_200_OK, content_type='image/png')
+            return Response(img, status=status.HTTP_200_OK, content_type='image/png')
         except Exception as ex:
             logger.error(ex)
-            
+
             return Response(status=status.HTTP_400_BAD_REQUEST)
