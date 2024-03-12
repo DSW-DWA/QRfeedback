@@ -20,7 +20,6 @@ class ReviewList(APIView):
         try:
             reviews = Review.objects.all()
             serializer = ReviewSerializer(reviews, many=True)
-            serializer.is_valid(raise_exception=True)
 
             logger.info('Reviews loaded')
 
