@@ -199,11 +199,11 @@
 
     <div class="container">
         <!-- Форма для ввода данных и загрузки изображения -->
-        <form id="upload-form" method="post" action="/api/reviews/" enctype="multipart/form-data">
+        <form id="upload-form" method="post" action="" enctype="multipart/form-data">
             {% csrf_token %} <!-- CSRF-токен для безопасной отправки формы -->
 
             <!-- Поле для ввода текста -->
-            <textarea id="user_input" name="review_text" placeholder="Напишите ваше обращение здесь..."
+            <textarea id="review_text" name="review_text" placeholder="Напишите ваше обращение здесь..."
                 rows="1"></textarea>
 
             <!-- Контейнер для загрузки изображений -->
@@ -216,7 +216,7 @@
             <div id="image-preview" class="file-preview"></div>
 
             <!-- Кнопка отправки формы -->
-            <button type="submit">Отправить</button>
+            <button id="submit" type="submit">Отправить</button>
         </form>
     </div>
 
@@ -261,6 +261,49 @@
 
                 reader.readAsDataURL(file);
             }
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        async function uploadReview(formData) {
+            const csrftoken = getCookie('csrftoken');
+            const response = await fetch('/api/reviews/', {
+                method: 'POST',
+                headers: {'X-CSRFToken': csrftoken},
+                mode: 'same-origin',
+                body: formData
+            });
+            const result = await response.json();
+            console.log(result);
+        }
+
+        const reviewTextEl = document.getElementById('review_text');
+        const imagesEl = document.querySelector('input[type="file"][multiple]');
+
+        document.getElementById('submit').addEventListener('click', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            formData.append('review_text', reviewTextEl.value)
+            for (const [i, img] of Array.from(imagesEl.files).entries()) {
+                formData.append(`images`, img);
+            }
+
+            uploadReview(formData)
         });
     </script>
 </body>
