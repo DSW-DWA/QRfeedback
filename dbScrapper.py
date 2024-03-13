@@ -12,17 +12,16 @@ BASE_DIR = Path(__file__).resolve().parent
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-token="7058906839:AAHvC7xiBEEf2oscvEhzGAD09AYdq6F1CSg" #не изменный, токен бота
-chat_id=647621082 # чат айди - стоит заглушка
+token=env('TOKEN_BOT') #не изменный, токен бота
+chat_id=int(env('CHAT_ID')) # чат айди - стоит заглушка
 
-# Подключение к базе данных PostgreSQL
 def connect_to_database():
     try:
         conn = psycopg2.connect(
-            dbname=env('DB_NAME'), #возможно другое название БД
-            user=env('DB_USER'),# возможно другое имя пользователя
-            password=env('DB_PASSWORD'), # возможен другой пароль
-            port=env('DB_PORT')     # возможен другой порт
+            dbname=env('DB_NAME')
+            user=env('DB_USER')
+            password=env('DB_PASSWORD')
+            port=env('DB_PORT')
         )
         print("Connected to the database")
         return conn
