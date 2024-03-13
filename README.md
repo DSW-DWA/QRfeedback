@@ -16,13 +16,18 @@ createdb -O qrfeedbackuser qrfeedackdb
 ```
 2. Создать .env файл в корне джанго проекта (в папке с manage.py). Пример файла с необходимыми полями:
 ```
+DEBUG=True
+HTTPS=False
 DB_NAME=qrfeedbackdb
 DB_USER=qrfeedbackuser
 DB_PASSWORD=qrfeedbackpassword
 DB_HOST=localhost
 DB_PORT=5432
-SECRET_KEY=(сгенрируйте свой ключ)
 DEBUG=TRUE
+SECRET_KEY=
+CHAT_ID=
+TOKEN_BOT=
+TIMEOUT=
 ```
 3. Провести и применить миграции:
 ```
