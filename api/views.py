@@ -23,7 +23,7 @@ class ReviewList(APIView):
 
             logger.info('Reviews loaded')
 
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as ex:
             logger.error(ex)
 
@@ -52,7 +52,7 @@ class ReviewDetail(APIView):
 
             logger.info('Review loaded')
 
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Review.DoesNotExist:
             logger.error('Review not found')
 

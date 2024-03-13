@@ -21,6 +21,8 @@ DB_USER=qrfeedbackuser
 DB_PASSWORD=qrfeedbackpassword
 DB_HOST=localhost
 DB_PORT=5432
+SECRET_KEY=(сгенрируйте свой ключ)
+DEBUG=TRUE
 ```
 3. Провести и применить миграции:
 ```
