@@ -9,11 +9,14 @@ import environ
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-env = environ.Env()
+env = environ.Env(
+    TIMEOUT=(int, 60),
+    CHAT_ID=(int, 0)
+)
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 token = env('TOKEN_BOT')  # не изменный, токен бота
-chat_id = int(env('CHAT_ID'))  # чат айди - стоит заглушка
+chat_id = env('CHAT_ID')  # чат айди - стоит заглушка
 
 
 def connect_to_database():
@@ -91,7 +94,7 @@ async def main():
         previous_data = await check_database_changes(conn, previous_data)
         await save_previous_data(previous_data)
         # ожидание 60 секунд перед следующей проверкой, можно поменять значение, чтобы чаще проверялось
-        await asyncio.sleep(int(env('TIMEOUT')))
+        await asyncio.sleep(env('TIMEOUT'))
 
 if __name__ == "__main__":
     asyncio.run(main())
