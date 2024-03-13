@@ -293,6 +293,9 @@
                     // Обработчик события клика для кнопки удаления
                     deleteButton.addEventListener('click', function () {
                         previewContainer.removeChild(itemContainer);
+
+                        var i = FILES.indexOf(file);
+                        FILES.splice(i, 1);
                     });
 
                     // Добавляем элементы в контейнер и контейнер в предпросмотр
