@@ -1,5 +1,6 @@
 import psycopg2
 import json
+import telegram
 from telegram import Bot
 from telegram.ext import ApplicationBuilder, CommandHandler
 import time
@@ -61,20 +62,15 @@ async def check_database_changes(conn, previous_data):
         id = row[0]
         if id in differences:
             review_text, pub_date = row[1], row[2]
-            message = f"Отзыв:\n{review_text}\nДата публикации: {pub_date}"
+            message = f"Обращение:\n{review_text}\nДата публикации: {pub_date.strftime('%H:%M %d/%m/%Y')}"
             cur.execute(
                 "SELECT image FROM api_image WHERE review_id=%s", (id,))
 
-            # photos = cur.fetchall()
             photo_paths = [os.path.join('media', photo[0])
                            for photo in cur.fetchall()]
-            print(photo_paths)
-            media_group = [open(image_path, 'rb')
-                           for image_path in photo_paths]
-            # media_group = []
-            # for image_path in photo_paths:
-            #     with open(image_path, 'rb') as image_file:
-            #         media_group.append(image_file.read())
+
+            media_group = [telegram.InputMediaPhoto(
+                open(image_path, 'rb')) for image_path in photo_paths]
 
             if len(media_group) > 0:
                 await send_message(TOKEN, CHAT_ID, message, media_group)
