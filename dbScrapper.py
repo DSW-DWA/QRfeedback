@@ -4,6 +4,7 @@ from telegram import Bot
 from telegram.ext import ApplicationBuilder, CommandHandler
 import time
 import os
+import sys
 import asyncio
 import environ
 from pathlib import Path
@@ -15,8 +16,8 @@ env = environ.Env(
 )
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-token = env('TOKEN_BOT')  # не изменный, токен бота
-chat_id = env('CHAT_ID')  # чат айди - стоит заглушка
+TOKEN = env('TOKEN_BOT')  # не изменный, токен бота
+CHAT_ID = env('CHAT_ID')  # чат айди - стоит заглушка
 
 
 def connect_to_database():
@@ -35,10 +36,15 @@ def connect_to_database():
         return None
 
 
-async def send_message(token, chat_id, message, photo=None):
+async def send_message(token, chat_id, message, photos=None):
     bot = Bot(token=token)
-    if photo:
-        await bot.send_photo(chat_id=chat_id, photo=photo, caption=message)
+
+    print('----------SENDING MESSSAGE-------------')
+    print(token, chat_id, message, photos, sep='\n')
+    print('---------------------------------------')
+
+    if photos is not None:
+        await bot.send_media_group(chat_id=chat_id, media=photos, caption=message)
     else:
         await bot.send_message(chat_id=chat_id, text=message)
 
@@ -58,13 +64,22 @@ async def check_database_changes(conn, previous_data):
             message = f"Отзыв:\n{review_text}\nДата публикации: {pub_date}"
             cur.execute(
                 "SELECT image FROM api_image WHERE review_id=%s", (id,))
-            photos = cur.fetchall()
 
-            if len(photos) > 0:
-                for pht in photos:
-                    await send_message(token, chat_id, message, pht)
+            # photos = cur.fetchall()
+            photo_paths = [os.path.join('media', photo[0])
+                           for photo in cur.fetchall()]
+            print(photo_paths)
+            media_group = [open(image_path, 'rb')
+                           for image_path in photo_paths]
+            # media_group = []
+            # for image_path in photo_paths:
+            #     with open(image_path, 'rb') as image_file:
+            #         media_group.append(image_file.read())
+
+            if len(media_group) > 0:
+                await send_message(TOKEN, CHAT_ID, message, media_group)
             else:
-                await send_message(token, chat_id, message)
+                await send_message(TOKEN, CHAT_ID, message)
 
     return new_data
 
@@ -93,8 +108,10 @@ async def main():
     while True:
         previous_data = await check_database_changes(conn, previous_data)
         await save_previous_data(previous_data)
-        # ожидание 60 секунд перед следующей проверкой, можно поменять значение, чтобы чаще проверялось
         await asyncio.sleep(env('TIMEOUT'))
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        sys.exit(1)
