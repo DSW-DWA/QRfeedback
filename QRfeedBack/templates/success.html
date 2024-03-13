@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+body {
+    font-family: 'Daxline', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 90%;
+    margin: 0 auto;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    margin-bottom: 15px;
+}
+
+h1 {
+    color: #683A7C;
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+p {
+    font-size: 32px;
+    color: #333;
+    text-align: justify;
+}
+
+table {
+    width: 80%;
+    max-width: 90%;
+    margin-top: 40px;
+    border-collapse: collapse;
+    border: 4px solid #683A7C;
+    overflow-x: auto;
+}
+
+th, td {
+    border: 2px solid #683A7C;
+    padding: 20px;
+    word-wrap: break-word; /* Разрыв слов в случае необходимости */
+    font-size: 32px;
+}
+
+th {
+    background-color: #683A7C;
+    color: #fff;
+    font-size: 40px;
+}
+
+td {
+    font-size: 32px;
+    white-space: pre-wrap;
+}
+
+@media screen and (max-width: 600px) {
+    .container {
+        width: 100%;
+        padding: 10px;
+    }
+
+    table {
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 16px;
+    }
+
+    h1 {
+        font-size: 36px;
+        margin-bottom: 16px;
+    }
+
+    p {
+        font-size: 24px;
+    }
+
+    th {
+        font-size: 32px;
+    }
+
+    td {
+        font-size: 24px;
+    }
+}
+
+    </style>
+<body>
+    <div class="container">
+        <h1>Ваше обращение успешно зарегистрировано!</h1>
+        <p>Мы получили ваше обращение и обработаем его в ближайшее время.</p>
+
+        <table>
+            <tr>
+                <th>Обращение</th>
+<!--                <th>Содержание</th>-->
+            </tr>
+            <tr>
+                <td class="title"></td> <!-- Ячейка для текста -->
+<!--                <td class="content"></td> &lt;!&ndash; Ячейка для изображения &ndash;&gt;-->
+            </tr>
+        </table>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Получаем параметры URL
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Извлекаем текст и URL изображения из параметров
+            const text = urlParams.get('text');
+<!--            const imageURL = urlParams.get('imageURL');-->
+
+            // Находим ячейки таблицы
+            const titleCell = document.querySelector('td.title');
+<!--            const contentCell = document.querySelector('td.content');-->
+
+            // Вставляем текст и изображение в соответствующие ячейки таблицы
+            titleCell.textContent = text;
+<!--            const image = document.createElement('img');-->
+<!--            image.src = imageURL;-->
+<!--            contentCell.appendChild(image);-->
+        });
+    </script>
+</body>
+
+</html>

@@ -37,7 +37,7 @@ class ReviewList(APIView):
 
             logger.info('Review created')
 
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as ex:
             logger.error(ex)
 
