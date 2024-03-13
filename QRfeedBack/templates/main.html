@@ -188,6 +188,44 @@
                 padding: 8px;
             }
         }
+        .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content p {
+    margin: 0;
+}
+
+.modal-content button {
+    display: block;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #683A7C;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.modal-content button:hover {
+    background-color: #4A235A;
+}
     </style>
 </head>
 
@@ -289,7 +327,40 @@
             });
             const result = await response.json();
             console.log(result);
-        }
+            console.log(response);
+
+            if (response.status === 210) {
+                console.log(response.status)
+                // Статус 200 означает успешное выполнение запроса
+                // Передаем данные на новую страницу через параметры URL
+                const queryParams = new URLSearchParams();
+                queryParams.append('text', result.review_text); // Передаем текст
+<!--                queryParams.append('imageURL', result.images); // Передаем URL изображения-->
+                window.location.href = "submit?" + queryParams.toString(); // Перенаправляем на новую страницу с параметрами
+            } else {
+                // Обработка других статусов ответа (например, ошибок сервера)
+                  const errorMessage = 'Произошла ошибка при выполнении запроса';
+
+                // Создаем элементы для модального окна
+                const modalOverlay = document.createElement('div');
+                modalOverlay.classList.add('modal-overlay');
+
+                const modalContent = document.createElement('div');
+                modalContent.classList.add('modal-content');
+                modalContent.innerHTML = '<p>' + errorMessage + '</p>';
+
+                const closeButton = document.createElement('button');
+                closeButton.textContent = 'Закрыть';
+                closeButton.addEventListener('click', function() {
+                    modalOverlay.remove(); // Закрываем модальное окно при клике на кнопку "Закрыть"
+                });
+
+                modalContent.appendChild(closeButton);
+                modalOverlay.appendChild(modalContent);
+                document.body.appendChild(modalOverlay);
+                }
+            }
+
 
         const reviewTextEl = document.getElementById('review_text');
         const imagesEl = document.querySelector('input[type="file"][multiple]');

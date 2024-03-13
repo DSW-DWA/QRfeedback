@@ -24,5 +24,6 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
+    path('submit/', views.submit_form, name='submit_form'),
     path('', views.main_page_view, name='main'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
