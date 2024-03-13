@@ -124,17 +124,17 @@ td {
 
             // Извлекаем текст и URL изображения из параметров
             const text = urlParams.get('text');
-<!--            const imageURL = urlParams.get('imageURL');-->
+            const imageURL = urlParams.get('imageURL');
 
             // Находим ячейки таблицы
             const titleCell = document.querySelector('td.title');
-<!--            const contentCell = document.querySelector('td.content');-->
+            const contentCell = document.querySelector('td.content');
 
             // Вставляем текст и изображение в соответствующие ячейки таблицы
             titleCell.textContent = text;
-<!--            const image = document.createElement('img');-->
-<!--            image.src = imageURL;-->
-<!--            contentCell.appendChild(image);-->
+            const image = document.createElement('img');
+            image.src = imageURL;
+            contentCell.appendChild(image);
         });
     </script>
 </body>
