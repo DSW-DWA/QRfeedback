@@ -13,7 +13,6 @@ def get_upload_qr_path(instance, filename):
 class Review(models.Model):
     review_text = models.TextField(blank=False, null=False)
     pub_date = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(upload_to=get_upload_image_path, blank=True, null=True)
 
     def __str__(self):
         str_repr = ' '.join(self.review_text.split()[:5])

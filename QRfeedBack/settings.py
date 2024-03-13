@@ -18,9 +18,9 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
-        DEBUG=(bool, True),
-        HTTPS=(bool, False),
-    )
+    DEBUG=(bool, True),
+    HTTPS=(bool, False),
+)
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
@@ -32,7 +32,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['65.20.115.209']
+ALLOWED_HOSTS = ['65.20.115.209', '127.0.0.1', 'localhost']
 
 # Application definition
 
@@ -167,6 +167,6 @@ if env('HTTPS'):
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
-    SECURE_HSTS_SECONDS = 31536000 # 1 year
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_PRELOAD = True
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
