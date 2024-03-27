@@ -8,3 +8,7 @@ def main_page_view(request):
 
 def submit_form(request):
     return render(request, 'success.html')
+
+
+def qr_form(request):
+    return render(request, 'QR_GEN.html')
