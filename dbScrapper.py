@@ -2,8 +2,6 @@ import psycopg2
 import json
 import telegram
 from telegram import Bot
-from telegram.ext import ApplicationBuilder, CommandHandler
-import time
 import os
 import sys
 import asyncio
@@ -63,7 +61,8 @@ async def check_database_changes(conn, previous_data):
         id = row[0]
         if id in differences:
             review_text, pub_date = row[1], row[2]
-            local_pub_date = pub_date.astimezone(timezone('Asia/Yekaterinburg'))
+            local_pub_date = pub_date.astimezone(
+                timezone('Asia/Yekaterinburg'))
             message = f"Обращение:\n{review_text}\nДата публикации: {local_pub_date.strftime('%H:%M %d/%m/%Y')}"
             cur.execute(
                 "SELECT image FROM api_image WHERE review_id=%s", (id,))

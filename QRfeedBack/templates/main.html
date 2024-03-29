@@ -324,6 +324,37 @@
             return cookieValue;
         }
 
+        function setCookie(name, value, attributes = {}) {
+            attributes = {
+                path: '/',
+                // add other defaults here if necessary
+                ...attributes
+            };
+
+            if (attributes.expires instanceof Date) {
+                attributes.expires = attributes.expires.toUTCString();
+            }
+
+            let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+            for (let attributeKey in attributes) {
+                updatedCookie += "; " + attributeKey;
+                let attributeValue = attributes[attributeKey];
+                if (attributeValue !== true) {
+                    updatedCookie += "=" + attributeValue;
+                }
+            }
+
+            document.cookie = updatedCookie;
+        }
+
+        function deleteCookie(name) {
+            setCookie(name, "", {
+                'max-age': -1
+            })
+        }
+
+
         async function uploadReview(formData) {
             const csrftoken = getCookie('csrftoken');
             const response = await fetch('/api/reviews/', {
@@ -380,6 +411,14 @@
             for (const [i, img] of Array.from(FILES).entries()) {
                 formData.append(`images`, img);
             }
+            const [address, tg_session_id] = [getCookie('address'), getCookie('tg_session_id')];
+
+            deleteCookie('address');
+            deleteCookie('tg_session_id');
+
+            console.log(address, tg_session_id)
+            formData.append('address', address);
+            formData.append('tg_session_id', tg_session_id);
 
             uploadReview(formData)
         });

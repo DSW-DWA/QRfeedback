@@ -11,6 +11,8 @@ def get_upload_qr_path(instance, filename):
 
 
 class Review(models.Model):
+    address = models.TextField(blank=False, null=False)
+    tg_session_id = models.TextField(blank=False, null=False)
     review_text = models.TextField(blank=False, null=False)
     pub_date = models.DateTimeField(auto_now_add=True)
 
