@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор QR-кода</title>
+    <style>
+        body {
+            font-family: 'Daxline', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        button {
+            width: calc(100% - 30px);
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: 'Daxline', Arial, sans-serif;
+            font-size: 14px;
+            background-color: #fff;
+        }
+
+        button {
+            background-color: #683A7C;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4A235A;
+        }
+
+        #qr-container {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        #qr-code {
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        #download-link {
+            display: block;
+            margin-top: 10px;
+            background-color: #683A7C;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        #download-link:hover {
+            background-color: #4A235A;
+        }
+      #preview-container {
+    text-align: center;
+    margin-top: 15px;
+}
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Генератор QR-кода</h1>
+        <div>
+            <label for="address">Адрес:</label>
+            <input type="text" id="address" placeholder="Введите адрес">
+        </div>
+        <div>
+            <label for="telegram-id">Id сессии Telegram:</label>
+            <input type="text" id="telegram-id" placeholder="Введите Telegram ID">
+        </div>
+        <button onclick="generateQR()">Создать QR-код</button>
+        <div id="qr-container"></div>
+          <div id="preview-container"></div>
+        <a id="download-link" href="#" download="qrcode.png" style="display: none;">Скачать QR-код</a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script>
+        function generateQR() {
+    var address = document.getElementById('address').value;
+    var telegramId = document.getElementById('telegram-id').value;
+    var secretKey = "your_secret_key"; // Здесь нужно использовать ваш секретный ключ для шифрования
+    var encryptedData = encryptData("telegram_id=" + telegramId, secretKey); // Шифруем данные
+    var qrText = "http://127.0.0.1:8000?address=" + encodeURIComponent(address) + "&encrypted_data=" + encodeURIComponent(encryptedData);
+
+    // Показываем предпросмотр QR-кода
+    var previewContainer = document.getElementById('preview-container');
+    previewContainer.innerHTML = '';
+    var qrPreview = new QRious({
+        value: qrText,
+        size: 100
+    });
+    var qrPreviewImg = document.createElement('img');
+    qrPreviewImg.src = qrPreview.toDataURL('image/png');
+    qrPreviewImg.style.borderRadius = '8px';
+    previewContainer.appendChild(qrPreviewImg);
+
+    var qrContainer = document.getElementById('qr-container');
+    qrContainer.innerHTML = ''; // Очистка контейнера перед созданием нового QR-кода
+    var qr = new QRious({
+        element: qrContainer,
+        value: qrText,
+        size: 200
+    });
+
+    // Создаем ссылку для скачивания QR-кода
+    var downloadLink = document.getElementById('download-link');
+    downloadLink.href = qr.toDataURL('image/png');
+    downloadLink.style.display = 'block';
+}
+
+function encryptData(data, key) {
+    var encryptedData = CryptoJS.AES.encrypt(data, key).toString();
+    return encryptedData;
+}
+
+    </script>
+</body>
+</html>
