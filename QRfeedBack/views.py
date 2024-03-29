@@ -1,4 +1,3 @@
-from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
 
@@ -11,4 +10,4 @@ def submit_form(request):
 
 
 def qr_form(request):
-    return render(request, 'QR_GEN.html')
+    return render(request, 'qrgen.html')

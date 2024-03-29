@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,14 +86,16 @@
         #download-link:hover {
             background-color: #4A235A;
         }
-      #preview-container {
-    text-align: center;
-    margin-top: 15px;
-}
+
+        #preview-container {
+            text-align: center;
+            margin-top: 15px;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
 </head>
+
 <body>
     <div class="container">
         <h1>Генератор QR-кода</h1>
@@ -106,50 +109,53 @@
         </div>
         <button onclick="generateQR()">Создать QR-код</button>
         <div id="qr-container"></div>
-          <div id="preview-container"></div>
+        <div id="preview-container"></div>
         <a id="download-link" href="#" download="qrcode.png" style="display: none;">Скачать QR-код</a>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script>
         function generateQR() {
-    var address = document.getElementById('address').value;
-    var telegramId = document.getElementById('telegram-id').value;
-    var secretKey = "your_secret_key"; // Здесь нужно использовать ваш секретный ключ для шифрования
-    var encryptedData = encryptData("telegram_id=" + telegramId, secretKey); // Шифруем данные
-    var qrText = "http://127.0.0.1:8000?address=" + encodeURIComponent(address) + "&encrypted_data=" + encodeURIComponent(encryptedData);
+            var address = document.getElementById('address').value;
+            var telegramId = document.getElementById('telegram-id').value;
+            var secretKey = "your_secret_key"; // Здесь нужно использовать ваш секретный ключ для шифрования
+            var encryptedData = encryptData("telegram_id=" + telegramId, secretKey); // Шифруем данные
 
-    // Показываем предпросмотр QR-кода
-    var previewContainer = document.getElementById('preview-container');
-    previewContainer.innerHTML = '';
-    var qrPreview = new QRious({
-        value: qrText,
-        size: 100
-    });
-    var qrPreviewImg = document.createElement('img');
-    qrPreviewImg.src = qrPreview.toDataURL('image/png');
-    qrPreviewImg.style.borderRadius = '8px';
-    previewContainer.appendChild(qrPreviewImg);
+            const proto = window.location.protocol
+            const host = window.location.host
+            var qrText = `${proto}//${host}?address=${encodeURIComponent(address)}&encrypted_data=${encodeURIComponent(encryptedData)}`;
 
-    var qrContainer = document.getElementById('qr-container');
-    qrContainer.innerHTML = ''; // Очистка контейнера перед созданием нового QR-кода
-    var qr = new QRious({
-        element: qrContainer,
-        value: qrText,
-        size: 200
-    });
+            // Показываем предпросмотр QR-кода
+            var previewContainer = document.getElementById('preview-container');
+            previewContainer.innerHTML = '';
+            var qrPreview = new QRious({
+                value: qrText,
+                size: 100
+            });
+            var qrPreviewImg = document.createElement('img');
+            qrPreviewImg.src = qrPreview.toDataURL('image/png');
+            qrPreviewImg.style.borderRadius = '8px';
+            previewContainer.appendChild(qrPreviewImg);
 
-    // Создаем ссылку для скачивания QR-кода
-    var downloadLink = document.getElementById('download-link');
-    downloadLink.href = qr.toDataURL('image/png');
-    downloadLink.style.display = 'block';
-}
+            var qrContainer = document.getElementById('qr-container');
+            qrContainer.innerHTML = ''; // Очистка контейнера перед созданием нового QR-кода
+            var qr = new QRious({
+                element: qrContainer,
+                value: qrText,
+                size: 200
+            });
 
-function encryptData(data, key) {
-    var encryptedData = CryptoJS.AES.encrypt(data, key).toString();
-    return encryptedData;
-}
+            // Создаем ссылку для скачивания QR-кода
+            var downloadLink = document.getElementById('download-link');
+            downloadLink.href = qr.toDataURL('image/png');
+            downloadLink.style.display = 'block';
+        }
 
+        function encryptData(data, key) {
+            var encryptedData = CryptoJS.AES.encrypt(data, key).toString();
+            return encryptedData;
+        }
     </script>
 </body>
+
 </html>
