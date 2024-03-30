@@ -21,7 +21,7 @@ class ReviewList(APIView):
             reviews = Review.objects.all()
             serializer = ReviewSerializer(reviews, many=True)
 
-            logger.info('Reviews loaded')
+            logger.info("Reviews loaded")
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as ex:
@@ -35,7 +35,7 @@ class ReviewList(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
-            logger.info('Review created')
+            logger.info("Review created")
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as ex:
@@ -50,11 +50,11 @@ class ReviewDetail(APIView):
             review = Review.objects.get(pk=pk)
             serializer = ReviewSerializer(review)
 
-            logger.info('Review loaded')
+            logger.info("Review loaded")
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Review.DoesNotExist:
-            logger.error('Review not found')
+            logger.error("Review not found")
 
             return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as ex:
@@ -72,13 +72,16 @@ class QRGenerator(APIView):
             serializer.is_valid(raise_exception=True)
 
             buffer = io.BytesIO()
-            url, scale, border = serializer.data['url'], serializer.data['scale'], serializer.data['border']
-            segno.make_qr(url).save(buffer, kind='png',
-                                    scale=scale, border=border)
+            url, scale, border = (
+                serializer.data["url"],
+                serializer.data["scale"],
+                serializer.data["border"],
+            )
+            segno.make_qr(url).save(buffer, kind="png", scale=scale, border=border)
             img = buffer.getvalue()
 
-            logger.info('QR generated')
-            return Response(img, status=status.HTTP_200_OK, content_type='image/png')
+            logger.info("QR generated")
+            return Response(img, status=status.HTTP_200_OK, content_type="image/png")
         except Exception as ex:
             logger.error(ex)
 
