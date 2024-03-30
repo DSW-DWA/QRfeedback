@@ -51,7 +51,8 @@ async def send_message(token, chat_id, message, photos=None):
 
 async def check_database_changes(conn, previous_data):
     cur = conn.cursor()
-    cur.execute("SELECT id, review_text, pub_date FROM api_review;")
+    cur.execute(
+        "SELECT id, review_text, pub_date, address, tg_session_id FROM api_review;")
     rows = cur.fetchall()
 
     new_data = set(row[0] for row in rows)
@@ -60,10 +61,16 @@ async def check_database_changes(conn, previous_data):
     for row in rows:
         id = row[0]
         if id in differences:
-            review_text, pub_date = row[1], row[2]
+            review_text, pub_date, address, tg_session_id = row[1:5]
+
             local_pub_date = pub_date.astimezone(
                 timezone('Asia/Yekaterinburg'))
-            message = f"Обращение:\n{review_text}\nДата публикации: {local_pub_date.strftime('%H:%M %d/%m/%Y')}"
+
+            message = f"\
+Адрес:\n{address}\n\n\
+Обращение:\n{review_text}\n\n\
+Дата публикации: {local_pub_date.strftime('%H:%M %d/%m/%Y')}"
+
             cur.execute(
                 "SELECT image FROM api_image WHERE review_id=%s", (id,))
 
@@ -74,9 +81,9 @@ async def check_database_changes(conn, previous_data):
                 open(image_path, 'rb')) for image_path in photo_paths]
 
             if len(media_group) > 0:
-                await send_message(TOKEN, CHAT_ID, message, media_group)
+                await send_message(TOKEN, tg_session_id, message, media_group)
             else:
-                await send_message(TOKEN, CHAT_ID, message)
+                await send_message(TOKEN, tg_session_id, message)
 
     return new_data
 

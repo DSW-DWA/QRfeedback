@@ -413,8 +413,8 @@
             }
             const [address, tg_session_id] = [getCookie('address'), getCookie('tg_session_id')];
 
-            deleteCookie('address');
-            deleteCookie('tg_session_id');
+            // deleteCookie('address');
+            // deleteCookie('tg_session_id');
 
             console.log(address, tg_session_id)
             formData.append('address', address);

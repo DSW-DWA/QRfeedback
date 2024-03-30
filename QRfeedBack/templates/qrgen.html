@@ -119,7 +119,9 @@
             var address = document.getElementById('address').value;
             var telegramId = document.getElementById('telegram-id').value;
             var secretKey = "your_secret_key"; // Здесь нужно использовать ваш секретный ключ для шифрования
-            var encryptedData = encryptData("telegram_id=" + telegramId, secretKey); // Шифруем данные
+            // var encryptedData = encryptData("telegram_id=" + telegramId, secretKey); // Шифруем данные
+            // don't encrypt for now
+            var encryptedData = telegramId
 
             const proto = window.location.protocol
             const host = window.location.host
@@ -151,8 +153,8 @@
             downloadLink.style.display = 'block';
         }
 
-        function encryptData(data, key) {
-            var encryptedData = CryptoJS.AES.encrypt(data, key).toString();
+        function encryptData(payload, key) {
+            var encryptedData = CryptoJS.AES.encrypt(payload, key).toString();
             return encryptedData;
         }
     </script>
