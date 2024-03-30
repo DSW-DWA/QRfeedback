@@ -1,12 +1,12 @@
 from django.shortcuts import render
-from django.http import Http404
+from django.http import HttpResponseBadRequest
 
 
 def main_page_view(request):
-    address = request.GET.get('address', '')
-    encrypted_data = request.GET.get('encrypted_data', '')
+    address = request.GET.get('address', '').strip()
+    encrypted_data = request.GET.get('encrypted_data', '').strip()
     if address == '' or encrypted_data == '':
-        raise Http404()
+        return HttpResponseBadRequest('<h1>Malformed request</h1>')
     return render(request, 'main.html')
 
 
