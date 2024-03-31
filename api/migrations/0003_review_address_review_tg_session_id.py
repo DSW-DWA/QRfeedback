@@ -6,20 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0002_remove_review_image'),
+        ("api", "0002_remove_review_image"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='review',
-            name='address',
-            field=models.TextField(default='TEST ADDRESS'),
+            model_name="review",
+            name="address",
+            field=models.TextField(default="TEST ADDRESS"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='review',
-            name='tg_session_id',
-            field=models.TextField(default='TEST SESSION ID'),
+            model_name="review",
+            name="tg_session_id",
+            field=models.TextField(default="TEST SESSION ID"),
             preserve_default=False,
         ),
     ]
