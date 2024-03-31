@@ -45,10 +45,13 @@ async def send_message(token, chat_id, message, photos=None):
     print(token, chat_id, message, photos, sep='\n')
     print('---------------------------------------')
 
-    if photos is not None:
-        await bot.send_media_group(chat_id=chat_id, media=photos, caption=message)
-    else:
-        await bot.send_message(chat_id=chat_id, text=message)
+    try:
+        if photos is not None:
+            await bot.send_media_group(chat_id=chat_id, media=photos, caption=message)
+        else:
+            await bot.send_message(chat_id=chat_id, text=message)
+    except Exception as e:
+        print(e)
 
 
 async def check_database_changes(conn, previous_data):
