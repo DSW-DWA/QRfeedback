@@ -35,18 +35,18 @@ def connect_to_database():
         return None
 
 
-async def send_message(token, chat_id, message, photos=None):
+async def send_message(token, chat_id, thread_id, message, photos=None):
     bot = Bot(token=token)
 
     print("----------SENDING MESSSAGE-------------")
-    print(token, chat_id, message, photos, sep="\n")
+    print(token, chat_id, thread_id, message, photos, sep="\n")
     print("---------------------------------------")
 
     try:
         if photos is not None:
-            await bot.send_media_group(chat_id=chat_id, media=photos, caption=message)
+            await bot.send_media_group(chat_id=chat_id, message_thread_id=thread_id, media=photos, caption=message)
         else:
-            await bot.send_message(chat_id=chat_id, text=message)
+            await bot.send_message(chat_id=chat_id, message_thread_id=thread_id, text=message)
     except Exception as e:
         print(e)
 
@@ -54,7 +54,7 @@ async def send_message(token, chat_id, message, photos=None):
 async def check_database_changes(conn, previous_data):
     cur = conn.cursor()
     cur.execute(
-        "SELECT id, review_text, pub_date, address, tg_session_id FROM api_review;"
+        "SELECT id, review_text, pub_date, address, tg_session_id, tg_thread_id FROM api_review;"
     )
     rows = cur.fetchall()
 
@@ -64,18 +64,21 @@ async def check_database_changes(conn, previous_data):
     for row in rows:
         id = row[0]
         if id in differences:
-            review_text, pub_date, address, tg_session_id = row[1:5]
+            review_text, pub_date, address, tg_session_id, tg_thread_id = row[1:]
 
-            local_pub_date = pub_date.astimezone(timezone("Asia/Yekaterinburg"))
+            local_pub_date = pub_date.astimezone(
+                timezone("Asia/Yekaterinburg"))
 
             message = f"\
 Адрес:\n{address}\n\n\
 Обращение:\n{review_text}\n\n\
 Дата публикации: {local_pub_date.strftime('%H:%M %d/%m/%Y')}"
 
-            cur.execute("SELECT image FROM api_image WHERE review_id=%s", (id,))
+            cur.execute(
+                "SELECT image FROM api_image WHERE review_id=%s", (id,))
 
-            photo_paths = [os.path.join("media", photo[0]) for photo in cur.fetchall()]
+            photo_paths = [os.path.join("media", photo[0])
+                           for photo in cur.fetchall()]
 
             media_group = [
                 telegram.InputMediaPhoto(open(image_path, "rb"))
@@ -83,9 +86,9 @@ async def check_database_changes(conn, previous_data):
             ]
 
             if len(media_group) > 0:
-                await send_message(TOKEN, tg_session_id, message, media_group)
+                await send_message(TOKEN, tg_session_id, tg_thread_id, message, media_group)
             else:
-                await send_message(TOKEN, tg_session_id, message)
+                await send_message(TOKEN, tg_session_id, tg_thread_id, message)
 
     return new_data
 
