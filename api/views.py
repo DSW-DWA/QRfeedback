@@ -77,7 +77,8 @@ class QRGenerator(APIView):
                 serializer.data["scale"],
                 serializer.data["border"],
             )
-            segno.make_qr(url).save(buffer, kind="png", scale=scale, border=border)
+            segno.make_qr(url).save(buffer, kind="png",
+                                    scale=scale, border=border)
             img = buffer.getvalue()
 
             logger.info("QR generated")

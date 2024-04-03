@@ -14,7 +14,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ["id", "review_text", "pub_date", "images", "address", "tg_session_id"]
+        fields = ["id", "review_text", "pub_date", "images",
+                  "address", "tg_session_id", "tg_thread_id"]
 
     def to_representation(self, instance):
         repr_data = {
@@ -23,6 +24,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             "pub_date": instance.pub_date,
             "address": instance.address,
             "tg_session_id": instance.tg_session_id,
+            "tg_thread_id": instance.tg_thread_id,
         }
 
         images = instance.images.values_list("image")
@@ -36,18 +38,26 @@ class ReviewSerializer(serializers.ModelSerializer):
             images = data.pop("images")
             for imgData in images:
                 imagesData.append({"image": imgData})
-        if "review_text" in data:
-            review_text = data["review_text"]
-        if "address" in data:
-            address = data["address"]
-        if "tg_session_id" in data:
-            tg_session_id = data["tg_session_id"].strip('"')
+
+        review_text = data.get("review_text", "")
+
+        address = data.get("address")
+        if address is None:
+            raise serializers.ValidationError
+
+        tg_session_id = data.get("tg_session_id")
+        if tg_session_id is None:
+            raise serializers.ValidationError
+        tg_session_id = tg_session_id.strip("\"")
+
+        tg_thread_id = data.get("tg_thread_id")
 
         processed_data = {
             "review_text": review_text,
             "images": imagesData,
             "address": address,
             "tg_session_id": tg_session_id,
+            "tg_thread_id": tg_thread_id
         }
 
         return super().to_internal_value(processed_data)
@@ -57,6 +67,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             review_text=validated_data["review_text"],
             address=validated_data["address"],
             tg_session_id=validated_data["tg_session_id"],
+            tg_thread_id=validated_data["tg_thread_id"],
         )
 
         for img in validated_data["images"]:

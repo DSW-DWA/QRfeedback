@@ -13,6 +13,7 @@ def get_upload_qr_path(instance, filename):
 class Review(models.Model):
     address = models.TextField(blank=False, null=False)
     tg_session_id = models.TextField(blank=False, null=False)
+    tg_thread_id = models.TextField(blank=True, null=True)
     review_text = models.TextField(blank=False, null=False)
     pub_date = models.DateTimeField(auto_now_add=True)
 
@@ -24,8 +25,10 @@ class Review(models.Model):
 
 
 class Image(models.Model):
-    review = models.ForeignKey(Review, related_name="images", on_delete=models.CASCADE)
-    image = models.ImageField(upload_to=get_upload_image_path, blank=False, null=False)
+    review = models.ForeignKey(
+        Review, related_name="images", on_delete=models.CASCADE)
+    image = models.ImageField(
+        upload_to=get_upload_image_path, blank=False, null=False)
 
     def __str__(self):
         return self.image.url
