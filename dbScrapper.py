@@ -39,7 +39,11 @@ async def send_message(token, chat_id, thread_id, message, photos=None):
     bot = Bot(token=token)
 
     print("----------SENDING MESSSAGE-------------")
-    print(token, chat_id, thread_id, message, photos, sep="\n")
+    print("TOKEN:", token)
+    print("CHAT_ID:", chat_id)
+    print("THREAD_ID:", thread_id)
+    print("MESSAGE:", message)
+    print("PHOTOS:", photos)
     print("---------------------------------------")
 
     try:
