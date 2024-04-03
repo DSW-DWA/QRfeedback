@@ -107,6 +107,10 @@
             <label for="telegram-id">Id сессии Telegram:</label>
             <input type="text" id="telegram-id" placeholder="Введите Telegram ID">
         </div>
+        <div>
+            <label for="telegram-thread-id">Id темы группы Telegram:</label>
+            <input type="text" id="telegram-thread-id" placeholder="Введите Telegram thread ID">
+        </div>
         <button onclick="generateQR()">Создать QR-код</button>
         <div id="qr-container"></div>
         <div id="preview-container"></div>
@@ -118,6 +122,12 @@
         function generateQR() {
             var address = document.getElementById('address').value;
             var telegramId = document.getElementById('telegram-id').value;
+            var telegramThreadId = document.getElementById('telegram-thread-id').value;
+
+            if (!address || !telegramId) {
+                alert("Пожалуйста, введите адрес и Telegram ID.");
+                return;
+            }
             var secretKey = "your_secret_key"; // Здесь нужно использовать ваш секретный ключ для шифрования
             // var encryptedData = encryptData("telegram_id=" + telegramId, secretKey); // Шифруем данные
             // don't encrypt for now
@@ -126,6 +136,10 @@
             const proto = window.location.protocol
             const host = window.location.host
             var qrText = `${proto}//${host}?address=${encodeURIComponent(address)}&encrypted_data=${encodeURIComponent(encryptedData)}`;
+
+            if (telegramThreadId) {
+                qrText += `&thread_id=${encodeURIComponent(telegramThreadId)}`;
+            }
 
             // Показываем предпросмотр QR-кода
             var previewContainer = document.getElementById('preview-container');
