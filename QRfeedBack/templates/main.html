@@ -381,11 +381,14 @@
                 formData.append(`images`, img);
             }
             const queryParams = new URLSearchParams(window.location.search);
-            const [address, tg_session_id, tg_thread_id] = [queryParams.get('address'), queryParams.get('encrypted_data'), queryParams.get('thread_id')]
+
+            const address = queryParams.get('address');
+            const tg_session_id = queryParams.get('encrypted_data');
+            const tg_thread_id = queryParams.get('thread_id');
 
             formData.append('address', address);
             formData.append('tg_session_id', tg_session_id);
-            if tg_thread_id !== null {
+            if (tg_thread_id !== null) {
                 formData.append('tg_thread_id', tg_thread_id);
             }
 
