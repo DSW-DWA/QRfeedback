@@ -1,6 +1,7 @@
 venv
 .venv
 .env
+.env.prod
 .idea
 __pycache__/
 .DS_Store
