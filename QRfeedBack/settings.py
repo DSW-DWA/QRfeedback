@@ -18,16 +18,12 @@ import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ENVIRONMENT = os.environ.get("ENV")
-if ENVIRONMENT == "prod":
-    environ.Env.read_env(os.path.join(BASE_DIR, ".env.prod"))
-else:
-    environ.Env.read_env(os.path.join(BASE_DIR, ".env.dev"))
-
 env = environ.Env(
     DEBUG=(bool, True),
     HTTPS=(bool, False),
 )
+
+env.read_env(BASE_DIR / env.str('ENV_PATH', '.env.dev'))
 
 
 # Quick-start development settings - unsuitable for production
