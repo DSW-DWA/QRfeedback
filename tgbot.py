@@ -1,23 +1,25 @@
-import asyncio
 import csv
 import logging
+from typing import Callable, Dict, List, Union
 
 import numpy as np
-from keras.models import load_model
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton
-from tensorflow.keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
 import pandas as pd
-from telegram.update import Update
-from telegram.ext import CallbackContext, Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
+from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
+                      ReplyKeyboardMarkup, ReplyKeyboardRemove, Update)
+from telegram.ext import (CallbackContext, CallbackQueryHandler,
+                          CommandHandler, ConversationHandler,
+                          Filters, MessageHandler, Updater)
 
-namesOfClasses = ["Часы работы","код клуба","Заморозка карты","не посещал по состояню здоровья","куда отправлять справку-больничный"
-                  ,"диагностика","бесплатная тренировка","расторжение","гостевой входит ли","персональные тренеры","справка для посещения бассейна"
-                  ,"разовый визит","хочу пригласить друга","в какое время меньше всего человек","аренда персональных шкафчиков","правила посещения ТЗ"
-                  ,"перефоормление карты","не получается записаться на тренировки","приложение не работает","не могу заморозить карту","хочу массаж, есть ли солярий"
-                  ,"нужна справка для налогового вычета", "хочу карту маме папе","есть ли только бассейн","есть ли подарочные сертификаты","у меня уже есть карта"
-                  ,"кто мой менеджер","почему меня не предупредили о отмене тренировки","со мной не связались","есть ли бонусы за привод друга",
-                  "куда можно оставить отзыв","сколько сейчас человек в бассейне"]
+from keras.models import load_model
+from keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.text import Tokenizer
+
+import config
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 model = load_model('question_classification_model.h5')
 
@@ -28,24 +30,27 @@ data = pd.read_csv('dataset.csv', names=['answer', 'question'], delimiter='`')
 tokenizer = Tokenizer(num_words=max_words, filters='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n', lower=True)
 tokenizer.fit_on_texts(data['question'])
 
-def start(update: Update, context: CallbackContext) -> None:
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Привет! Я бот, который может классифицировать вопросы. Задайте мне вопрос, и я постараюсь отнести его к одному из классов.")
+with open('meta_class.csv', newline='',encoding='UTF-8') as csvfile:
+    reader = csv.reader(csvfile, delimiter='`')
+    namesOfClasses = [row[1] for row in reader]
+print(namesOfClasses)
 
-def handle_callback_query(update: Update, context: CallbackContext) -> None:
-    query = update.callback_query
-    data = query.data
+def start(update: Update, context: CallbackContext) -> int:
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Привет! Я бот, который может классифицировать вопросы. "
+             "Задайте мне вопрос, и я постараюсь отнести его к одному из классов."
+    )
 
-    if data == "yes":
-        pass
+    return SELECT_QUESTION
 
-    elif data == "no":
-        question_text = query.message.text
+def select_question(update: Update, context: CallbackContext) -> int:
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Введите вопрос:"
+    )
 
-        with open("new_info.csv", "a", newline="",encoding="UTF-8") as csvfile:
-            writer = csv.writer(csvfile, delimiter="`")
-            writer.writerow([question_text])
-
-    query.message.delete()
+    return SELECT_QUESTION
 
 
 def handle_text_message(update: Update, context: CallbackContext) -> None:
@@ -57,7 +62,7 @@ def handle_text_message(update: Update, context: CallbackContext) -> None:
     processed_text = np.squeeze(processed_text)
 
     predicted_class = model.predict(np.array([processed_text]))
-    predicted_class = np.argmax(predicted_class) + 1
+    predicted_class = np.argmax(predicted_class)
 
     keyboard = [
         [
@@ -68,44 +73,163 @@ def handle_text_message(update: Update, context: CallbackContext) -> None:
 
     markup = InlineKeyboardMarkup(keyboard)
     print(text)
-    print(f"Предсказанный класс: {predicted_class},{namesOfClasses[predicted_class - 1]}")
+    print(predicted_class+1)
+    print(len(namesOfClasses))
+    print(f"Предсказанный класс: {predicted_class+1},{namesOfClasses[predicted_class-1]}")
     print("-------------------------------")
     context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text=f"{predicted_class}`{namesOfClasses[predicted_class - 1]}`{text}",
+        text=f"{predicted_class+1}`{namesOfClasses[predicted_class]}`{text}",
         reply_markup=markup,
     )
-#text=f"Предсказанный класс: {predicted_class},{namesOfClasses[predicted_class - 1]}` текст вопроса: {text}",
+
+def handle_callback_query(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    data = query.data
+
+    if data == "yes":
+        pass
+
+    if data == "no":
+        question_text = query.message.text
+
+        with open("new_info.csv", "a", newline="", encoding="UTF-8") as csvfile:
+            writer = csv.writer(csvfile, delimiter="`")
+            writer.writerow([question_text])
+
+    query.message.delete()
+def change_class(update: Update, context: CallbackContext) -> int:
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Введите пароль:"
+    )
+
+    return ENTER_PASSWORD
+
+def enter_password(update: Update, context: CallbackContext) -> int:
+    password = update.message.text
+
+    if password == config.ADMIN_PASSWORD:
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Выберите класс, который хотите изменить:"
+        )
+
+        buttons = []
+        for idx, name in enumerate(namesOfClasses, start=1):
+            name=namesOfClasses[idx-1]
+            print(name)
+            button = InlineKeyboardButton(text=name, callback_data=str(idx))
+            buttons.append(button)
+
+        keyboard = [buttons[i:i + 2] for i in range(0, len(buttons), 2)]
 
 
 
-async def main():
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Выберите класс:",
+            reply_markup=reply_markup
+        )
+
+        return SELECT_CLASS_ID
+    else:
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Неверный пароль!"
+        )
+
+        return ConversationHandler.END
+
+def select_class_id(update: Update, context: CallbackContext) -> int:
+    query = update.callback_query
+    query.answer()
+
+    class_id = int(query.data)
+
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=f"Введите новое название для класса {namesOfClasses[class_id - 1]}:"
+    )
+
+    context.user_data['class_id'] = class_id
+
+    return ENTER_NEW_CLASS_NAME
+
+def enter_new_class_name(update: Update, context: CallbackContext) -> int:
+    new_class_name = update.message.text
+
+    class_id = context.user_data['class_id']
+
+    with open(config.META_CLASSES_PATH, 'r',encoding='UTF-8') as csvfile:
+        reader = csv.reader(csvfile, delimiter='`')
+        rows = list(reader)
+
+    rows[class_id - 1][1] = new_class_name
+
+    with open(config.META_CLASSES_PATH, 'w', newline='',encoding='UTF-8') as csvfile:
+        writer = csv.writer(csvfile, delimiter='`')
+        writer.writerows(rows)
+
+    namesOfClasses[class_id - 1] = new_class_name
+
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=f"Класс {class_id} успешно изменен на {new_class_name}!"
+    )
+
+    return ConversationHandler.END
+
+SELECT_QUESTION, ENTER_PASSWORD, SELECT_CLASS_ID, ENTER_NEW_CLASS_NAME = range(4)
+
+def main() -> None:
+    updater = Updater(token=config.BOT_TOKEN, use_context=True)
+
+    dp = updater.dispatcher
+
+    conversation = ConversationHandler(
+        entry_points=[CommandHandler('start', start), CommandHandler('change', change_class)],
+        states={
+            SELECT_QUESTION: [
+                MessageHandler(
+                    Filters.text & (~Filters.command),
+                    handle_text_message,
 
 
-    import os
-    TOKEN = "7058906839:AAHvC7xiBEEf2oscvEhzGAD09AYdq6F1CSg"
+                )
+            ],
+            ENTER_PASSWORD: [
+                MessageHandler(
+                    Filters.text,
+                    enter_password
+                )
+            ],
+            SELECT_CLASS_ID: [
+                CallbackQueryHandler(
+                    select_class_id
+                )
+            ],
+            ENTER_NEW_CLASS_NAME: [
+                MessageHandler(
+                    Filters.text,
+                    enter_new_class_name
+                )
+            ],
+        },
+        fallbacks=[],
+        allow_reentry=True,
+        per_chat=True,
+    )
 
-    updater = Updater(token=TOKEN, use_context=True)
 
-    dispatcher = updater.dispatcher
-
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), handle_text_message))
-    dispatcher.add_handler(CallbackQueryHandler(handle_callback_query))
+    dp.add_handler(conversation)
+    dp.add_handler(CallbackQueryHandler(handle_callback_query))
+    
     updater.start_polling()
+
     updater.idle()
 
-
-    #while True:
-     #   print("xcczczc")
-      #  updater.update_queue.put_nowait(updater.bot.get_updates())
-       # updates = updater.bot.get_updates()
-        #print(f"Received {len(updates)} updates")
-        #for update in updates:
-         #   print(update)
-        #updater.update_queue.put_nowait(updates)
-        #await asyncio.sleep(15)
-if __name__ == "__main__":
-    print("запускаем мейн")
-    asyncio.run(main())
+if __name__ == '__main__':
+    main()
