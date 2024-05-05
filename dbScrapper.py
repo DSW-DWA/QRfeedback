@@ -12,11 +12,13 @@ from pathlib import Path
 from pytz import timezone
 
 BASE_DIR = Path(__file__).resolve().parent
-env = environ.Env(TIMEOUT=(int, 60), CHAT_ID=(int, 0))
-environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+env = environ.Env(
+    TIMEOUT=(int, 60),
+)
 
-TOKEN = env("TOKEN_BOT")  # не изменный, токен бота
-CHAT_ID = env("CHAT_ID")  # чат айди - стоит заглушка
+env.read_env(BASE_DIR / env.str('ENV_PATH', '.env'))
+
+TOKEN = env("TOKEN_BOT")
 
 
 def connect_to_database():
