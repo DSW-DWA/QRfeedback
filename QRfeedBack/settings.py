@@ -23,16 +23,14 @@ env = environ.Env(
     HTTPS=(bool, False),
 )
 
-env.read_env(BASE_DIR / env.str('ENV_PATH', '.env.dev'))
+env.read_env(BASE_DIR / env.str('ENV_PATH', '.env'))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS").split()
