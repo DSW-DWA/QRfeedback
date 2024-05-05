@@ -5,7 +5,7 @@ venv
 .idea
 __pycache__/
 .DS_Store
-media/
-static/
-logs
+logs/
+data/
+bruno/
 previous_data.json

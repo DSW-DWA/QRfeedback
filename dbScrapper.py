@@ -14,6 +14,8 @@ from pytz import timezone
 BASE_DIR = Path(__file__).resolve().parent
 env = environ.Env(
     TIMEOUT=(int, 60),
+    DB_PORT=(str, "5432"),
+    MEDIA_ROOT=(str, "data")
 )
 
 env.read_env(BASE_DIR / env.str('ENV_PATH', '.env'))
@@ -41,7 +43,6 @@ async def send_message(token, chat_id, thread_id, message, photos=None):
     bot = Bot(token=token)
 
     print("----------SENDING MESSSAGE-------------")
-    print("TOKEN:", token)
     print("CHAT_ID:", chat_id)
     print("THREAD_ID:", thread_id)
     print("MESSAGE:", message)
@@ -83,7 +84,7 @@ async def check_database_changes(conn, previous_data):
             cur.execute(
                 "SELECT image FROM api_image WHERE review_id=%s", (id,))
 
-            photo_paths = [os.path.join("media", photo[0])
+            photo_paths = [os.path.join(env("MEDIA_ROOT"), "media", photo[0])
                            for photo in cur.fetchall()]
 
             media_group = [
@@ -127,7 +128,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        sys.exit(1)
+    asyncio.run(main())

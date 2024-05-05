@@ -1,0 +1,48 @@
+services:
+  web:
+    build: ./
+    command: >
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             gunicorn QRfeedBack.wsgi:application --bind=0.0.0.0:8000 --workers=4"
+    volumes:
+      - static_volume:/app/data/
+    expose:
+      - 8000
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+  scrapper:
+    build: ./
+    command: >
+      sh -c "python manage.py wait_for_db &&
+             python dbScrapper.py"
+    volumes:
+      - static_volume:/app/data/
+    environment:
+      - MEDIA_ROOT=/app/data/
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=qrfeedbackdb
+      - POSTGRES_USER=qrfeedbackuser
+      - POSTGRES_PASSWORD=qrfeedbackpassword
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/app/data/
+    ports:
+      - 80:80
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  static_volume:
