@@ -14,6 +14,8 @@ services:
     depends_on:
       - db
     restart: always
+    environment:
+      - DEBUG=False
   scrapper:
     build: ./
     command: >
@@ -22,7 +24,8 @@ services:
     volumes:
       - static_volume:/app/data/
     environment:
-      - MEDIA_ROOT=/app/data/
+      - MEDIA_ROOT=/app/data
+      - HOSTNAME=http://65.20.115.209
     env_file:
       - ./.env
     depends_on:
